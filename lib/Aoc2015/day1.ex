@@ -13,11 +13,11 @@ defmodule Aoc.Aoc2015.Day1 do
   def find_floor(input_string) do
 
     input_string
-    |> String.codepoints
+    |> to_charlist
     |> Enum.reduce(0, fn(x, acc) ->
       case x do
-         "(" -> acc = acc + 1
-         ")" -> acc = acc - 1
+         ?( -> acc = acc + 1
+         ?) -> acc = acc - 1
        end
     end)
   end
@@ -29,15 +29,15 @@ defmodule Aoc.Aoc2015.Day1 do
   def steps_to_basement() do
     File.read!("./lib/Aoc2015/day1_input.txt")
     |> String.trim
-    |> String.codepoints
+    |> to_charlist
     |> Enum.reduce({0,0}, fn(x, acc) ->
 
       case acc do
         {n, -1} -> n
         {n, p} ->
           case x do
-            "(" -> {n + 1, p + 1 }
-            ")" -> {n + 1, p - 1 }
+            ?( -> {n + 1, p + 1 }
+            ?) -> {n + 1, p - 1 }
           end
           n -> n
       end
