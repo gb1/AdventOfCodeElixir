@@ -4,7 +4,7 @@ defmodule Aoc.Aoc2016.Day4 do
   Parse input file and return the sum of the sector ids
 
   iex>Aoc.Aoc2016.Day4.solve_part_1
-  33
+  137896
   """
   def solve_part_1 do
     {:ok, file} = File.read("./lib/Aoc2016/day4.txt")
@@ -24,6 +24,36 @@ defmodule Aoc.Aoc2016.Day4 do
       # IO.inspect total/
       # IO.inspect sector_id
       total + sector_id
+    end)
+  end
+
+  @doc """
+  iex>Aoc.Aoc2016.Day4.solve_part_2
+  501
+  """
+  def solve_part_2 do
+    {:ok, file} = File.read("./lib/Aoc2016/day4.txt")
+
+    file
+    |> String.split("\n")
+    |> Enum.filter( fn(line)-> line !== "" end)
+    |> Enum.reduce(0, fn(room, acc)->
+
+      {sector_id, _} = room
+      |> String.split("-")
+      |> List.last
+      |> String.split("[")
+      |> List.first
+      |> Integer.parse
+
+      decrypted = room |> decrypt(sector_id)
+
+
+      if  String.contains?(decrypted, "north")   do
+        sector_id
+      else
+        acc
+      end
     end)
   end
 
@@ -88,4 +118,23 @@ defmodule Aoc.Aoc2016.Day4 do
 
   end
 
+  @doc ~S"""
+  Hail Caesar!
+
+  ##Tests
+  iex>Aoc.Aoc2016.Day4.decrypt("qzmt-123" , 343)
+  "very"
+  """
+  def decrypt(room, sector_id) do
+    cipher_map =
+    String.codepoints("abcdefghijklmnopqrstuvwxyz")
+    |> Stream.cycle
+    |> Stream.drop(26 - rem(sector_id, 26))
+    |> Stream.zip(String.codepoints("abcdefghijklmnopqrstuvwxyz"))
+    |> Map.new
+
+    room
+    |> String.codepoints
+    |> Enum.map_join(&Map.get(cipher_map, &1))
+  end
 end

@@ -1,0 +1,4 @@
+Compiling 1 file (.ex)
+Excluding tags: [:skip]
+
+Terminate batch job (Y/N)? 

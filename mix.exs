@@ -28,6 +28,7 @@ defmodule Aoc.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:mix_test_watch, "~> 0.2", only: :dev},
-     {:combination, "~> 0.0.2"}]
+     {:combination, "~> 0.0.2"},
+     {:credo, "~> 0.5", only: [:dev, :test]}]
   end
 end
