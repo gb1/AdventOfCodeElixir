@@ -74,7 +74,7 @@ defmodule Aoc.Aoc2016.Day6Test do
 
   test "test the file input for part 1" do
     {:ok, sample_input} = File.read("./lib/Aoc2016/day6.txt")
-    assert Aoc.Aoc2016.Day6.part1(sample_input) === ""
+    assert Aoc.Aoc2016.Day6.part1(sample_input) === "mshjnduc"
   end
 
   test "test the sample input for part 2" do
@@ -84,7 +84,7 @@ defmodule Aoc.Aoc2016.Day6Test do
 
   test "test the file input for part 2" do
     {:ok, sample_input} = File.read("./lib/Aoc2016/day6.txt")
-    assert Aoc.Aoc2016.Day6.part2(sample_input) === ""
+    assert Aoc.Aoc2016.Day6.part2(sample_input) === "apfeeebz"
   end
 
 end
