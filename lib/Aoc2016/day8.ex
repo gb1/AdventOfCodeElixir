@@ -1,6 +1,29 @@
 defmodule Aoc.Aoc2016.Day8 do
 
   @doc """
+  iex>Aoc.Aoc2016.Day8.part1
+  110
+  """
+  def part1 do
+    tcds = build_tcds(50,6, [])
+
+    {:ok, file} = File.read("./lib/Aoc2016/day8.txt")
+    file
+    |> String.split("\n")
+    |> Enum.filter( fn(line)-> line !== "" end)
+    |> Enum.map( fn(line)->
+      case line do
+        "rect" <> rest ->
+          {:rect, rest}
+        "rotate row" <> rest ->
+          {:row, rest}
+        "rotate column" <> rest ->
+          {:col, rest}
+      end
+    end)
+  end
+
+  @doc """
   iex>Aoc.Aoc2016.Day8.build_tcds(7,3,[])
   Matrix.new([["🎄","🎄","🎄","🎄","🎄","🎄","🎄"],
    ["🎄","🎄","🎄","🎄","🎄","🎄","🎄"],
@@ -54,20 +77,36 @@ defmodule Aoc.Aoc2016.Day8 do
     put_into_tcds(tail, tcds)
   end
 
+  def rotate_row(row, rotations, tcds) do
+    rotated_vector = tcds
+    |> Matrix.row(row)
+    |> Vector.to_list
+    |> rotate_a_list(rotations)
+
+    tcds
+    |> Matrix.rows
+    |> List.replace_at(row, rotated_vector |> Vector.from_list)
+    |> Matrix.from_rows
+    # row = tcds |> Enum.at(update_row) |> Vector.to_list
+    # row = row |> List.replace_at(col, new_values |> Enum.at(update_row))
+    # rows = rows |> List.replace_at(update_row, row |> Vector.from_list)
+
+    # IO.inspect
+
+  end
+
   def rotate_col(col, rotations, tcds) do
     rotated_vector = tcds
     |> Matrix.column(col)
     |> Vector.to_list
     |> rotate_a_list(rotations)
 
-    tcds = tcds
+    tcds
     |> Matrix.rows
     |> update_rows(col, rotated_vector, length(rotated_vector))
     |> Matrix.from_rows
 
-    tcds |> Matrix.rows |> IO.inspect
 
-    tcds
     # IO.inspect tcds
     # tcds
     # |> Matrix.rows
@@ -139,4 +178,18 @@ defmodule Aoc.Aoc2016.Day8Test do
 
     assert Aoc.Aoc2016.Day8.rotate_col(1, 1, input) === output
   end
+
+  # @tag :skip
+  test "test the row rotation" do
+
+    input = Matrix.new([["🎅","🎄","🎅","🎄","🎄","🎄","🎄"],
+                         ["🎅","🎅","🎅","🎄","🎄","🎄","🎄"],
+                         ["🎄","🎅","🎄","🎄","🎄","🎄","🎄"]],3,7)
+    output = Matrix.new([["🎄","🎄","🎄","🎄","🎅","🎄","🎅"],
+                         ["🎅","🎅","🎅","🎄","🎄","🎄","🎄"],
+                         ["🎄","🎅","🎄","🎄","🎄","🎄","🎄"]],3,7)
+
+    assert Aoc.Aoc2016.Day8.rotate_row(0, 4, input) === output
+  end
+
 end
