@@ -29,6 +29,7 @@ defmodule Aoc.Mixfile do
   defp deps do
     [{:mix_test_watch, "~> 0.2", only: :dev},
      {:combination, "~> 0.0.2"},
-     {:credo, "~> 0.5", only: [:dev, :test]}]
+     {:credo, "~> 0.5", only: [:dev, :test]},
+     {:tensor, "~> 0.7.2"}]
   end
 end
