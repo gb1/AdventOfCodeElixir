@@ -2,41 +2,99 @@ defmodule Aoc.Aoc2016.Day8 do
 
   @doc """
   iex>Aoc.Aoc2016.Day8.part1
-  110
+  128
   """
   def part1 do
-    tcds = build_tcds(50,6, [])
+    tcds = build_tcds(50,6,6,[])
 
     {:ok, file} = File.read("./lib/Aoc2016/day8.txt")
-    file
+
+    instructions = file
     |> String.split("\n")
     |> Enum.filter( fn(line)-> line !== "" end)
     |> Enum.map( fn(line)->
       case line do
         "rect" <> rest ->
-          {:rect, rest}
+          {:rect, rest |> extract_ints}
         "rotate row" <> rest ->
-          {:row, rest}
+          {:row, rest |> extract_ints}
         "rotate column" <> rest ->
-          {:col, rest}
+          {:col, rest |> extract_ints}
       end
+    end)
+
+    tcds = execute_instructions(instructions, tcds)
+
+    tcds
+    |> Matrix.rows
+    |> Enum.each(fn(row)->
+      row
+      |> Vector.to_list
+      |> List.flatten
+      |> Enum.join
+      |> IO.inspect
+    end)
+
+    tcds
+    |> Matrix.rows
+    |> Enum.reduce(0, fn(row, acc)->
+      count  = row
+      |> Vector.to_list
+      |> List.flatten
+      |> Enum.count( &(&1 === "🎅"))
+      |> IO.inspect
+
+      acc + count
     end)
   end
 
+  def execute_instructions([], tcds), do: tcds
+  def execute_instructions(instructions, tcds) do
+    instruction = instructions |> List.first
+
+    [x,y] = instruction |> elem(1)
+
+    tcds =
+    case instruction |> elem(0) do
+      :rect -> create_rectangle(x, y, tcds)
+      :col -> rotate_col(x, y, tcds)
+      :row -> rotate_row(x, y, tcds)
+    end
+    # IO.inspect tcds
+
+    execute_instructions(instructions |> Enum.drop(1), tcds)
+  end
+
   @doc """
-  iex>Aoc.Aoc2016.Day8.build_tcds(7,3,[])
+  Extract two integers from a string
+
+  iex>Aoc.Aoc2016.Day8.extract_ints(" x=11 by 5")
+  [11,5]
+
+  iex>Aoc.Aoc2016.Day8.extract_ints(" y=0 by 7")
+  [0,7]
+
+  """
+  def extract_ints(string) do
+    string
+    |> (&Regex.scan(~r/[0-9]+/, &1)).()
+    |> List.flatten
+    |> Enum.map(&(&1 |> Integer.parse) |> elem(0))
+  end
+
+
+  @doc """
+  iex>Aoc.Aoc2016.Day8.build_tcds(7,3,3,[])
   Matrix.new([["🎄","🎄","🎄","🎄","🎄","🎄","🎄"],
    ["🎄","🎄","🎄","🎄","🎄","🎄","🎄"],
    ["🎄","🎄","🎄","🎄","🎄","🎄","🎄"]],3,7)
   """
-  def build_tcds(_,0,tcds) do
-    tcds |> Matrix.new(3,7)
+  def build_tcds(x,y,0,tcds) do
+    tcds |> Matrix.new(y,x)
   end
-  def build_tcds(x,y,tcds) do
-
+  def build_tcds(x,y,count,tcds) do
     tcds = tcds |> List.insert_at(0, build_row(x, []))
-    # IO.inspect tcds
-    build_tcds(x, y-1, tcds)
+    build_tcds(x,y,count-1,tcds)
   end
 
   @doc """
@@ -56,7 +114,7 @@ defmodule Aoc.Aoc2016.Day8 do
   @doc """
   Create a x,y rectangle starting in the top left corner
 
-  iex>Aoc.Aoc2016.Day8.create_rectangle(3,2, Aoc.Aoc2016.Day8.build_tcds(7,3,[]))
+  iex>Aoc.Aoc2016.Day8.create_rectangle(3,2, Aoc.Aoc2016.Day8.build_tcds(7,3,3,[]))
   Matrix.new([["🎅","🎅","🎅","🎄","🎄","🎄","🎄"],
    ["🎅","🎅","🎅","🎄","🎄","🎄","🎄"],
    ["🎄","🎄","🎄","🎄","🎄","🎄","🎄"]],3,7)
@@ -105,35 +163,6 @@ defmodule Aoc.Aoc2016.Day8 do
     |> Matrix.rows
     |> update_rows(col, rotated_vector, length(rotated_vector))
     |> Matrix.from_rows
-
-
-    # IO.inspect tcds
-    # tcds
-    # |> Matrix.rows
-    # |> Enum.map( fn(row)->
-    #   IO.inspect row
-    #   # |> Vector.to_list
-    #   # |> List.replace_at(col, "A")
-    #   # |> Vector.from_list
-    # end)
-    # |> Matrix.from_rows
-    # |> IO.inspect
-    # tcds
-    # |> Matrix.columns
-    #
-    # |> List.replace_at(col, rotated_vector)
-    # |> Matrix.from_rows
-    # |> Matrix.rows
-    # |> Enum.each(fn(row)->
-    #   IO.inspect row
-    # end)
-    # |> Matrix.rotate_clockwise
-    # |> Matrix.rotate_clockwise
-    # |> Matrix.rotate_clockwise
-    # |> IO.inspect
-
-    # tcds
-    # Matrix.from_rows
 
   end
   def update_rows(rows, col, new_values, 0), do: rows
