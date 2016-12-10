@@ -7,58 +7,39 @@ defmodule Aoc.Aoc2016.Day9 do
   def part1 do
     {:ok, file} = File.read("./lib/Aoc2016/day9.txt")
 
-    keys = file
-    |> (&Regex.scan(~r/[^\)]\([0-9]+x[0-9]+\)/U, &1)).()
+    file
+    |> String.codepoints
+    |> String.replace("\n") #every time this gets me!
+    |> decompress("")
+    |> String.length
+  end
 
+  @doc """
+  iex>"ADVENT" |> String.codepoints |> Aoc.Aoc2016.Day9.decompress("")
+  "ADVENT"
+  iex>"A(1x5)BC" |> String.codepoints |> Aoc.Aoc2016.Day9.decompress("")
+  "ABBBBBC"
+  iex>"A(2x2)BCD(2x2)EFG" |> String.codepoints |> Aoc.Aoc2016.Day9.decompress("")
+  "ABCBCDEFEFG"
+  """
+  def decompress([], decompressed), do: decompressed
 
-    # #regex result ends up with the last letter of the "bits" at the start
-    # #of the keys, get the letters and add to the bits
-    missing_last_letters =
-      keys
-      |> Enum.map(fn(key)->
-        key
-        |> List.first
-        |> String.codepoints
-        |> List.first
-      end)
+  def decompress(["(" | tail], decompressed) do
+    marker = tail |> Enum.take_while(&(&1 != ")")) |> List.to_string
+    [count, repeat] = extract_ints marker
+    string_to_repeat = tail
+    |> Enum.slice(String.length(marker)+1, count)
+    |> List.to_string
 
+    decompressed = decompressed <> repeat_string(string_to_repeat, "", repeat)
+    decompress(tail |> Enum.drop(String.length(marker) + count + 1) , decompressed)
+  end
 
-    bits = file
-    |> String.split(~r/[^\)]\([0-9]+x[0-9]+\)/U)
-
-    last_bit = bits |> List.last |> String.replace("\n", "")
-    bits = List.zip([bits, missing_last_letters])
-
-
-    bits = bits
-    |> Enum.map(fn(row)->
-      elem(row, 0) <> elem(row, 1)
-    end)
-
-    bits = bits |> Enum.drop(1)
-    bits = bits ++ [last_bit]
-
-
-    keys
-    #
-    # keys = keys
-    # |> Enum.map(fn(key)->
-    #   key |> List.first |> extract_ints
-    # end)
-    # keys |> List.insert_at(0, [14,1])
-    # #
-    # # # add on a blank row to get things lined up
-    # # # keys = keys |> List.insert_at(0, [])
-    # # bits = bits |> Enum.drop(1)
-    # #
-    # List.zip([keys, bits])
-    # |> Enum.map(fn(chunk)->
-    #   decompress(elem(chunk,0), elem(chunk,1))
-    # end)
-    # # |> List.last
-    # |> Enum.join
-    # |> String.length
-
+  def decompress([head|tail], decompressed) do
+    decompress(tail , decompressed <> head)
+  end
+  def decompress(list, decompressed) do
+    list
   end
 
   @doc """
@@ -72,29 +53,9 @@ defmodule Aoc.Aoc2016.Day9 do
     |> Enum.map(&(&1 |> Integer.parse) |> elem(0))
   end
 
-  @doc """
-  iex>Aoc.Aoc2016.Day9.decompress([1,5], "BC")
-  "BBBBBC"
-  iex>Aoc.Aoc2016.Day9.decompress([3,3], "XYZ")
-  "XYZXYZXYZ"
-  iex>Aoc.Aoc2016.Day9.decompress([6,1], "(1x3)A")
-  "(1x3)A"
-  iex>Aoc.Aoc2016.Day9.decompress([4,12], "LAMTLYVGMJBGV")
-  "LAMTLAMTLAMTLAMTLAMTLAMTLAMTLAMTLAMTLAMTLAMTLAMTLYVGMJBGV"
-  """
-  def decompress([], string), do: string
-  def decompress([chars, repeat], string) do
-    repeated = string
-    |> String.codepoints
-    |> Enum.take(chars)
-    |> Enum.join
-    |> repeat_string("", repeat)
-
-    repeated <> (String.split_at(string, chars) |> elem(1))
-  end
-
   def repeat_string(string, result, 0), do: result
   def repeat_string(string, result, count) do
-     repeat_string(string, result <> string, count - 1)
+    repeat_string(string, result <> string, count - 1)
   end
+
 end

@@ -195,7 +195,7 @@ ExUnit.start(exclude: [:skip])
 defmodule Aoc.Aoc2016.Day8Test do
   use ExUnit.Case, async: true
 
-  # @tag :skip
+  @tag :skip
   test "test the col rotation" do
 
     input = Matrix.new([["🎅","🎅","🎅","🎄","🎄","🎄","🎄"],
@@ -208,7 +208,7 @@ defmodule Aoc.Aoc2016.Day8Test do
     assert Aoc.Aoc2016.Day8.rotate_col(1, 1, input) === output
   end
 
-  # @tag :skip
+  @tag :skip
   test "test the row rotation" do
 
     input = Matrix.new([["🎅","🎄","🎅","🎄","🎄","🎄","🎄"],

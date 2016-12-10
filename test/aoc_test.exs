@@ -7,7 +7,7 @@ defmodule AocTest do
   # doctest Aoc.Aoc2016.Day1
   # doctest Aoc.Aoc2016.Day3
   # doctest Aoc.Aoc2016.Day7
-  doctest Aoc.Aoc2016.Day8
+  doctest Aoc.Aoc2016.Day9
 
   # test "the truth" do
   #   assert 1 + 1 == 2
