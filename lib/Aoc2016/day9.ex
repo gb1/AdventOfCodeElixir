@@ -8,8 +8,8 @@ defmodule Aoc.Aoc2016.Day9 do
     {:ok, file} = File.read("./lib/Aoc2016/day9.txt")
 
     file
+    |> String.replace("\n", "") #every time this gets me!
     |> String.codepoints
-    |> String.replace("\n") #every time this gets me!
     |> decompress("")
     |> String.length
   end
