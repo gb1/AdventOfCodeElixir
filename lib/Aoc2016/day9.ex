@@ -11,8 +11,81 @@ defmodule Aoc.Aoc2016.Day9 do
     |> String.replace("\n", "") #every time this gets me!
     |> String.codepoints
     |> decompress("")
-    |> String.length
+    # |> String.length
+    :pass
   end
+
+  # def part2 do
+  #   {:ok, file} = File.read("./lib/Aoc2016/day9.txt")
+  #
+  #   file
+  #   |> String.replace("\n", "")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.codepoints
+  #   |> decompress("")
+  #   |> String.length
+  # end
+  #
+  # def mega_decompress(string) do
+  #   case string |> String.contains?("(") do
+  #     true -> mega_decompress(decompress(string, "") |> List.to_string)
+  #     false -> string
+  #   end
+  # end
 
   @doc """
   iex>"ADVENT" |> String.codepoints |> Aoc.Aoc2016.Day9.decompress("")
@@ -59,3 +132,17 @@ defmodule Aoc.Aoc2016.Day9 do
   end
 
 end
+
+# ExUnit.start(exclude: [:skip])
+# ExUnit.configure(timeout: :infinity)
+#
+# defmodule Aoc.Aoc2016.Day9Test do
+#   use ExUnit.Case, async: true
+#
+#   test "part 2" do
+#
+#     assert Aoc.Aoc2016.Day9.part2 === 123
+#
+#   end
+
+# end
