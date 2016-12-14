@@ -2,26 +2,12 @@ defmodule Aoc.Aoc2016.Day14 do
 
   def generate_keys(salt) do
 
-    #  Stream.unfold({0, 1}, fn {a, b} -> {a, {a + 1, b}} end)
-    #  |> Enum.take(10)
-    #
-
-    # 0..16109 |> Enum.reduce_until([], fn(nonce, acc)->
-    #
-    #   if is_hash?(salt, nonce) do
-    #     acc |> List.insert_at(-1, nonce)
-    #   else
-    #     acc
-    #   end
-    # end)
-    # |> Enum.at(63)
-
-
-    # Stream.iterate(0, &(&1 + 1))
-    #
-    # Stream.unfold(next_acc, next_fun)
-    #
-    :pass
+    Stream.unfold({0,0}, fn({nonce, new_state})->
+      {hash, nonce} = get_next_hash(salt, nonce)
+      {nonce, {nonce + 1, 0}}
+    end)
+    |> Enum.take(64)
+    |> Enum.at(63)
   end
 
   def get_next_hash({hash, nonce}), do: {hash, nonce}
@@ -36,6 +22,7 @@ defmodule Aoc.Aoc2016.Day14 do
   end
 
   def hash(salt, nonce) do
+    # IO.inspect nonce
     :crypto.hash(:md5, (salt <> Integer.to_string(nonce)))
     |> Base.encode16
     |> String.downcase
@@ -117,7 +104,7 @@ defmodule Aoc.Aoc2016.Day14Test do
   end
 
   test "solve part 1" do
-    assert Aoc.Aoc2016.Day14.generate_keys("zpqevtbw") === :pass
+    assert Aoc.Aoc2016.Day14.generate_keys("zpqevtbw") === 16106
   end
 
 end
