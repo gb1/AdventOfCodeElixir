@@ -9,6 +9,7 @@ defmodule Aoc.Aoc2016.Day12 do
     file
     |> String.split("\n")
     |> Enum.filter(&(&1 !== ""))
+    #initialise c => 1 for part 2
     |> execute_instructions(%{:a => 0, :b => 0, :c => 1, :d =>0}, 0, false)
   end
 

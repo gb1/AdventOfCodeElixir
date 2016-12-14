@@ -26,7 +26,7 @@ defmodule Aoc.Aoc2016.Day11 do
   false
   """
   def will_chip_be_fried?(floor_state) do
-    false
+    
   end
 
 end
