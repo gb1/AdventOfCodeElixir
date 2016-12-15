@@ -16,8 +16,8 @@ defmodule Aoc.Aoc2016.Day14 do
       {hash, nonce} = get_next_stretched_hash(salt, nonce)
       {nonce, {nonce + 1, 0}}
     end)
-    |> Enum.take(64)
-    |> Enum.at(63)
+    |> Enum.take(1)
+    |> Enum.at(0)
   end
 
   def get_next_hash({hash, nonce}), do: {hash, nonce}
@@ -39,22 +39,35 @@ defmodule Aoc.Aoc2016.Day14 do
 
   def get_next_stretched_hash({hash, nonce}), do: {hash, nonce}
   def get_next_stretched_hash(salt, nonce) do
+    IO.inspect (salt <> Integer.to_string(nonce))
     hash = stretched_hash((salt <> Integer.to_string(nonce)), 2017)
 
-    if is_stretched_hash?(hash, salt, nonce) do
+    if is_stretched_hash?(hash, (salt <> Integer.to_string(nonce)), nonce) do
+    # if is_stretched_hash?("4a81e578d9f43511ab693eee1a75f194", "abc10", 10) do
+
+      IO.inspect nonce
+      IO.inspect (salt <> Integer.to_string(nonce))
       get_next_stretched_hash({hash, nonce})
     else
       get_next_stretched_hash(salt, nonce + 1)
     end
+
   end
 
   def stretched_hash(salt, 0), do: salt
   def stretched_hash(salt, stretch_no) do
-    hash = :crypto.hash(:md5, salt)
-    |> Base.encode16
-    |> String.downcase
-
-    stretched_hash(hash, stretch_no - 1)
+    salt = salt |> String.downcase
+    hash = case Agent.get(:cache, &Map.has_key?(&1, salt)) do
+      false->
+        hash = :crypto.hash(:md5, salt)
+        |> Base.encode16
+        |> String.downcase
+        Agent.update(:cache, &Map.put(&1, salt, hash))
+        hash
+      true->
+        Agent.get(:cache, &Map.get(&1, salt))
+    end
+        stretched_hash(hash, stretch_no - 1)
   end
 
   def is_hash?(hash, salt, nonce) do
@@ -97,13 +110,19 @@ defmodule Aoc.Aoc2016.Day14 do
   end
 
   def next_stretched_1000_contains_a_quintet?(salt, count, char) do
-      Enum.reduce_while(count + 1..count + 1000, false, fn(i, acc)->
-        if stretched_hash((salt <> Integer.to_string(i)), 2017) |> contains_quintet?(char) do
-          {:halt, true}
-        else
-          {:cont, false}
-        end
-      end)
+
+    original_salt = salt |> String.replace(Integer.to_string(count), "")
+
+    # IO.inspect(original_salt)
+    Enum.reduce_while(count + 1..count + 1000, false, fn(i, acc)->
+      # IO.inspect(original_salt <> Integer.to_string(i))
+      hash = stretched_hash(original_salt <> Integer.to_string(i), 2017)
+      if hash |> contains_quintet?(char) do
+        {:halt, true}
+      else
+        {:cont, false}
+      end
+    end)
   end
 end
 
@@ -151,15 +170,29 @@ defmodule Aoc.Aoc2016.Day14Test do
     assert Aoc.Aoc2016.Day14.generate_keys("zpqevtbw") === 16106
   end
 
+  @tag :skip
   test "stretched hash function" do
+    Agent.start_link(fn -> %{} end, name: :cache)
+    assert Aoc.Aoc2016.Day14.stretched_hash("abc0", 2017) |> String.contains?("a107ff")
     assert Aoc.Aoc2016.Day14.stretched_hash("abc0", 2017) |> String.contains?("a107ff")
   end
 
-  test "get next stretched hash" do
-    assert Aoc.Aoc2016.Day14.get_next_stretched_hash("abc", 0) === {"4a81e578d9f43511ab693eee1a75f194", 10}
+  @tag :skip
+  test "is a valid stretched hash" do
+    Agent.start_link(fn -> %{} end, name: :cache)
+    assert Aoc.Aoc2016.Day14.is_stretched_hash?("4a81e578d9f43511ab693eee1a75f194", "abc10", 10) === true
+    # assert Aoc.Aoc2016.Day14.stretched_hash("abc10", 2017) === ""
   end
 
+  @tag :skip
+  test "get next stretched hash" do
+    Agent.start_link(fn -> %{} end, name: :cache)
+    assert Aoc.Aoc2016.Day14.get_next_stretched_hash("abc",10) === {"4a81e578d9f43511ab693eee1a75f194", 10}
+  end
+
+  # @tag :skip
   test "solve part 2" do
+    Agent.start_link(fn -> %{} end, name: :cache)
     assert Aoc.Aoc2016.Day14.generate_keys_part2("zpqevtbw") === 16106
   end
 
