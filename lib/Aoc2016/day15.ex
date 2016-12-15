@@ -1,6 +1,15 @@
-defmodule Aoc.Aoc2016.Day15 do
+  defmodule Aoc.Aoc2016.Day15 do
 
-  def solve_for_test_data do
+  def parallel_solve(collection) do
+    collection
+    |> Enum.map(&Task.async(fn -> solve(&1) end))
+    |> Enum.map(&Task.await(&1))
+    |> Enum.filter(fn(x)->
+      x !== 0
+    end)
+  end
+
+  def solve_for_test_data() do
     0..100
     |> Enum.reduce_while(nil, fn(seconds_to_wait, acc)->
       case drop_capsule(create_discs |> fast_forward(seconds_to_wait)) do
@@ -8,8 +17,24 @@ defmodule Aoc.Aoc2016.Day15 do
         false -> {:cont, nil}
       end
     end)
-    |> IO.inspect
+  end
 
+  def solve(seconds_to_wait) do
+    case drop_capsule(create_part1_discs |> fast_forward(seconds_to_wait)) do
+      true -> seconds_to_wait
+      false -> 0
+    end
+  end
+
+  ### TOO SLOOOWWWWWWWWWWWWW
+  def solve_for_part_1 do
+    0..100000
+    |> Enum.reduce_while(nil, fn(seconds_to_wait, acc)->
+      case drop_capsule(create_part1_discs |> fast_forward(seconds_to_wait)) do
+        true -> {:halt, seconds_to_wait}
+        false -> {:cont, nil}
+      end
+    end)
   end
 
   def fast_forward(discs, 0), do: discs
@@ -33,6 +58,21 @@ defmodule Aoc.Aoc2016.Day15 do
       %{:disc => 2, :positions => 2, :position => 1 }]
   end
 
+  # Disc #1 has 13 positions; at time=0, it is at position 11.
+  # Disc #2 has 5 positions; at time=0, it is at position 0.
+  # Disc #3 has 17 positions; at time=0, it is at position 11.
+  # Disc #4 has 3 positions; at time=0, it is at position 0.
+  # Disc #5 has 7 positions; at time=0, it is at position 2.
+  # Disc #6 has 19 positions; at time=0, it is at position 17.
+  def create_part1_discs do
+    [%{:disc => 1, :positions => 13, :position => 11 },
+     %{:disc => 2, :positions => 5, :position => 0 },
+     %{:disc => 3, :positions => 17, :position => 11 },
+     %{:disc => 4, :positions => 3, :position => 0 },
+     %{:disc => 5, :positions => 7, :position => 2 },
+     %{:disc => 6, :positions => 19, :position => 17 }]
+  end
+
   def tick(discs) do
     discs = discs
     |> Enum.map(fn(disc)->
@@ -46,7 +86,7 @@ defmodule Aoc.Aoc2016.Day15 do
 end
 
 ExUnit.start(exclude: [:skip])
-# ExUnit.configure(timeout: :infinity)
+ExUnit.configure(timeout: :infinity)
 
 defmodule Aoc.Aoc2016.Day15Test do
   use ExUnit.Case, async: true
@@ -96,5 +136,12 @@ defmodule Aoc.Aoc2016.Day15Test do
   test "solve for the test data" do
     assert solve_for_test_data === 5
   end
+
+  @tag :skip
+  test "solve for the part 1" do
+    assert solve_for_part_1 === 5
+  end
+
+
 
 end
